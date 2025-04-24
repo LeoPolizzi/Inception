@@ -40,5 +40,5 @@ wp --allow-root user create \
 	--user_pass="${MDB_USER_PWD}" \
 	--path="/var/www/html"
 
-# Run CMD
+# Run WordPress in the foreground with passed commands
 exec "$@"

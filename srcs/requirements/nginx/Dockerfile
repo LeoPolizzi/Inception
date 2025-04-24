@@ -21,3 +21,6 @@ EXPOSE	443
 
 # Execute entrypoint script
 ENTRYPOINT	["sh", "/entrypoint.sh"]
+
+# Run nginx in the foreground
+CMD		["nginx", "-g", "daemon off;"]
