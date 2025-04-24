@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Checks if the /run/mysqld directory exists, and if not, creates it with the appropriate permissions.
 if [ ! -d "/run/mysqld" ]; then

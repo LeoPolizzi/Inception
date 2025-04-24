@@ -18,6 +18,32 @@ services:
     restart: always
 
   wordpress:
+    build:
+      contexte: ${INCEPTION_PATH}/requirements/wordpress
+      dockerfile: Dockerfile
+      args:
+        - WP_PHP_USER=${WP_PHP_USER}
+        - WP_PHP_GROUP=${WP_PHP_GROUP}
+    container_name: ${WP_CONTAINER_NAME}
+    image: ${WP_IMAGE_NAME}
+    ports:
+      - ${WP_PORT}:${WP_PORT}
+    volumes:
+      - ${INCEPTION_PATH}/secrets/mariadb/mdb_user_pwd.txt:/run/secrets/mariadb/mdb_user_pwd.txt:ro
+      - ${INCEPTION_PATH}/secrets/wordpress:/run/secrets/wordpress:ro
+      - inception_wordpress_volume:/var/www/html
+    env_file:
+      - ${ENV_PATH}
+    networks:
+      - ${NETWORK_NAME}
+    depends_on:
+      - mariadb
+    healthcheck:
+      test: ["CMD_SHELL", "echo 'WordPress is running'"]
+      interval: 20s
+      timeout: 30s
+      retries: 5
+    restart: always
 
   nginx:
     build: ${INCEPTION_PATH}/requirements/nginx
