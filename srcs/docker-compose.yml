@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+
+  mariadb:
+    build: ${INCEPTION_PATH}/requirements/mariadb
+    container_name: ${MDB_CONTAINER_NAME}
+    image: ${MDB_IMAGE_NAME}
+    ports:
+      - ${MDB_PORT}:${MDB_PORT}
+    volumes:
+      - ${INCEPTION_PATH}/secrets/mariadb:/run/secrets/mariadb:ro
+      - inception_mariadb_volume:/var/lib/mysql
+    env_file:
+      - ${ENV_PATH}
+    networks:
+      - ${NETWORK_NAME}
+    restart: always
+
+  wordpress:
+
+  nginx:
+    build: ${INCEPTION_PATH}/requirements/nginx
+    container_name: ${NGINX_CONTAINER_NAME}
+    image: ${NGINX_IMAGE_NAME}
+    ports:
+      - ${NGINX_PORT}:${NGINX_PORT}
+    volumes:
+      - ${INCEPTION_PATH}/secrets/ssl:/etc/nginx/ssl:ro
+    env_file:
+      - ${ENV_PATH}
+    networks:
+      - ${NETWORK_NAME}
+    depends_on:
+      wordpress:
+        condition: service_healthy
+    restart: always
+
+volumes:
+  inception_mariadb_volume:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${INCEPTION_PATH}/srcs/requirements/mariadb/data
+    name: ${MDB_VOLUME_NAME}
+
+  inception_wordpress_volume:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${INCEPTION_PATH}/srcs/requirements/wordpress/data
+    name: ${WP_VOLUME_NAME}
+
+networks:
+  inception:
+    name: ${NETWORK_NAME}
+    driver: bridge
