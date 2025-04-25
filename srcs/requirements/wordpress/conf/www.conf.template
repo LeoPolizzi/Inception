@@ -1,12 +1,12 @@
 [www]
 
-user = $WP_PHP_USER
-group = $WP_PHP_GROUP
+user = ${WP_PHP_USER}
+group = ${WP_PHP_GROUP}
 
-listen = $WP_PORT
+listen = 0.0.0.0:${WP_PORT}
 
-listen.owner = $WP_PHP_LISTEN_OWNER
-listen.group = $WP_PHP_LISTEN_OWNER
+listen.owner = ${WP_PHP_LISTEN_OWNER}
+listen.group = ${WP_PHP_LISTEN_OWNER}
 
 pm = dynamic
 pm.max_children = 5

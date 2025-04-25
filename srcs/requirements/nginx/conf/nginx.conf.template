@@ -1,39 +1,40 @@
-server
-{
-	# Domain name the server will respond to
-		server_name		$DOMAIN_NAME;
-	# Directory with website files
-		root			/var/www/html;
-	# Default index files
-		index			index.php index.html index.htm;
+worker_processes 1;
 
-	# Ports the server will listen on (First line for ipv4, second for ipv6)
-		listen			$NGINX_PORT ssl http2;
-		listen			[::]:$NGINX_PORT ssl http2;
+events {
+    worker_connections 1024;
+}
 
-	# SSL configuration
-		ssl_certificate	/etc/nginx/ssl/$DOMAIN_NAME.crt;
-		ssl_certificate_key	/etc/nginx/ssl/$DOMAIN_NAME.key;
-		ssl_protocols		TLSv1.2 TLSv1.3;
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+    sendfile      on;
 
-	# PHP files porcessing with FastCGI
-		location ~ \.php$
-		{
-			# Split URI into script name and path info to pass the request to PHP processor inside WordPress container
-			fastcgi_split_path_info ^(.+\.php)(/.+)$;
-			fastcgi_pass wordpress:$WP_PORT;
-			fastcgi_index index.php;
+    server {
+        listen ${NGINX_PORT} ssl;
+        listen [::]:${NGINX_PORT} ssl;
+		http2 on;
 
-			include fastcgi_params;
+        server_name ${DOMAIN_NAME};
+        root /var/www/html;
+        index index.php index.html index.htm;
 
-			fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-			fastcgi_param PATH_INFO $fastcgi_path_info;
-		}
+        ssl_certificate     /etc/nginx/ssl/${DOMAIN_NAME}.crt;
+        ssl_certificate_key /etc/nginx/ssl/${DOMAIN_NAME}.key;
+        ssl_protocols       TLSv1.2 TLSv1.3;
 
-	# Static files processing
-		location /
-		{
-			try_files $uri $uri/ =404;
-			autoindex on;
-		}
+        location ~ \.php$ {
+            fastcgi_split_path_info ^(.+\.php)(/.+)$;
+            fastcgi_pass inception_wordpress_container:${WP_PORT};
+            fastcgi_index index.php;
+
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_param PATH_INFO $fastcgi_path_info;
+        }
+
+        location / {
+            try_files $uri $uri/ =404;
+            autoindex on;
+        }
+    }
 }

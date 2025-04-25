@@ -10,29 +10,19 @@ ENV		WP_PHP_GROUP=${WP_PHP_GROUP}
 
 # Update the package index and install necessary packages
 RUN		apk update && apk add --no-cache \
-			php8 \
-			php8-fpm \
-			php8-mysqli \
-			php8-pdo \
-			php8-pdo_mysql \
-			php8-curl \
-			php8-gd \
-			php8-zip \
-			php8-xml \
-			php8-mbstring \
-			php8-session \
-			php8-openssl \
-			php8-json \
-			php8-tokenizer \
-			php8-fileinfo \
-			php8-exif \
-			php8-dom \
-			php8-simplexml \
-			php8-opcache \
+			php82 \
+			php82-fpm \
+			php82-phar \
+			php82-mysqli \
+			php82-xml \
+			php82-mbstring \
 			curl \
 			wget \
-			tar \
+			gettext \
 			mariadb-client
+
+# Create secrets directory
+RUN		mkdir /secrets
 
 # Copy the configuration files and setup script
 COPY	./conf/* ./
@@ -45,8 +35,8 @@ RUN		adduser -S ${WP_PHP_USER} \
 		&& mv -f wp-cli.phar /usr/local/bin/wp \
 		&& chmod +x setup.sh
 
-# Set the setup script as the entrypoint
-ENTRYPOINT	["sh", "setup.sh"]
+# Expose the necessary ports
+EXPOSE	9000
 
-# Make php-fpm run in the foreground
-CMD		["php-fpm8", "-F"]
+# Set the setup script as the entrypoint
+CMD		["sh", "setup.sh"]

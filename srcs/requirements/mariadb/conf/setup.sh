@@ -1,14 +1,18 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e  # Exit immediately if a command exits with a non-zero status
 
 # Fails if required secrets are missing
-for secret in /run/secrets/mdb_root_pwd.txt /run/secrets/mdb_user_pwd.txt; do
+for secret in /secrets/mariadb/mdb_root_pwd.txt /secrets/mariadb/mdb_user_pwd.txt; do
     if [ ! -f "$secret" ]; then
         echo "Error: Missing required secret file: $secret"
         exit 1
     fi
 done
+
+# Load secrets into variables
+MDB_USER_PWD=$(cat /secrets/mariadb/mdb_user_pwd.txt)
+MDB_ROOT_PWD=$(cat /secrets/mariadb/mdb_root_pwd.txt)
 
 # Fails if required environment variables are not set
 for var in MDB_ROOT MDB_HOST MDB_NAME MDB_USER; do
@@ -46,11 +50,11 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
     DROP DATABASE IF EXISTS test;
     DELETE FROM mysql.db WHERE Db='test';
     DELETE FROM mysql.user WHERE User='${MDB_ROOT}' AND Host NOT IN ('${MDB_HOST}', '127.0.0.1', '::1');
-    ALTER USER 'root'@'${MDB_HOST}' IDENTIFIED BY '$(cat /run/secrets/mdb_root_pwd.txt)';
+    ALTER USER 'root'@'${MDB_HOST}' IDENTIFIED BY '${MDB_ROOT_PWD}';
     CREATE DATABASE IF NOT EXISTS \`${MDB_NAME}\` CHARACTER SET utf8 COLLATE utf8_general_ci;
-    CREATE USER IF NOT EXISTS '${MDB_USER}'@'%' IDENTIFIED BY '$(cat /run/secrets/mdb_user_pwd.txt)';
+    CREATE USER IF NOT EXISTS '${MDB_USER}'@'%' IDENTIFIED BY '${MDB_USER_PWD}';
     GRANT ALL PRIVILEGES ON \`${MDB_NAME}\`.* TO '${MDB_USER}'@'%';
-    GRANT ALL PRIVILEGES ON *.* TO '${MDB_USER}'@'${MDB_HOST}' IDENTIFIED BY '$(cat /run/secrets/mdb_user_pwd.txt)';
+    GRANT ALL PRIVILEGES ON *.* TO '${MDB_USER}'@'${MDB_HOST}' IDENTIFIED BY '${MDB_USER_PWD}';
     FLUSH PRIVILEGES;
 EOF
 
@@ -63,4 +67,4 @@ sed -i "s|skip-networking|# skip-networking|g" /etc/my.cnf.d/mariadb-server.cnf
 sed -i "s|.*bind-address\s*=.*|bind-address=0.0.0.0|g" /etc/my.cnf.d/mariadb-server.cnf
 
 # Starts MariaDB server in foreground with any passed command
-exec "$@"
+exec /usr/bin/mysqld --user=mysql --console

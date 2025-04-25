@@ -1,3 +1,6 @@
 secrets/*
 srcs/env
 srcs/.env
+srcs/requirements/wordpress/data
+srcs/requirements/mariadb/data
+logs

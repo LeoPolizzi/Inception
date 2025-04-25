@@ -6,6 +6,9 @@ WORKDIR	/var/www/html
 # Install dependencies
 RUN		apk update && apk upgrade && apk add --no-cache nginx gettext
 
+# Create secrets directory
+RUN		mkdir /secrets
+
 # Delete default nginx.conf
 RUN		rm -f /etc/nginx/nginx.conf
 
@@ -20,7 +23,4 @@ RUN		chmod +x /entrypoint.sh
 EXPOSE	443
 
 # Execute entrypoint script
-ENTRYPOINT	["sh", "/entrypoint.sh"]
-
-# Run nginx in the foreground
-CMD		["nginx", "-g", "daemon off;"]
+CMD		["sh", "/entrypoint.sh"]

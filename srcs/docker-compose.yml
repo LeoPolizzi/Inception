@@ -1,15 +1,13 @@
-version: '3.8'
-
 services:
 
   mariadb:
-    build: ${INCEPTION_PATH}/requirements/mariadb
+    build: ${INCEPTION_PATH}/srcs/requirements/mariadb
     container_name: ${MDB_CONTAINER_NAME}
     image: ${MDB_IMAGE_NAME}
     ports:
       - ${MDB_PORT}:${MDB_PORT}
     volumes:
-      - ${INCEPTION_PATH}/secrets/mariadb:/run/secrets/mariadb:ro
+      - ${SECRETS_PATH}/mariadb:/secrets/mariadb:ro
       - inception_mariadb_volume:/var/lib/mysql
     env_file:
       - ${ENV_PATH}
@@ -19,7 +17,7 @@ services:
 
   wordpress:
     build:
-      contexte: ${INCEPTION_PATH}/requirements/wordpress
+      context: ${INCEPTION_PATH}/srcs/requirements/wordpress
       dockerfile: Dockerfile
       args:
         - WP_PHP_USER=${WP_PHP_USER}
@@ -29,30 +27,34 @@ services:
     ports:
       - ${WP_PORT}:${WP_PORT}
     volumes:
-      - ${INCEPTION_PATH}/secrets/mariadb/mdb_user_pwd.txt:/run/secrets/mariadb/mdb_user_pwd.txt:ro
-      - ${INCEPTION_PATH}/secrets/wordpress:/run/secrets/wordpress:ro
+      - ${SECRETS_PATH}/mariadb/mdb_user_pwd.txt:/secrets/mariadb/mdb_user_pwd.txt:ro
+      - ${SECRETS_PATH}/wordpress:/secrets/wordpress:ro
       - inception_wordpress_volume:/var/www/html
     env_file:
       - ${ENV_PATH}
     networks:
       - ${NETWORK_NAME}
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     depends_on:
       - mariadb
     healthcheck:
-      test: ["CMD_SHELL", "echo 'WordPress is running'"]
+      test: ["CMD-SHELL", "echo 'WordPress is running'"]
       interval: 20s
       timeout: 30s
-      retries: 5
+      retries: 50
     restart: always
 
   nginx:
-    build: ${INCEPTION_PATH}/requirements/nginx
+    build: ${INCEPTION_PATH}/srcs/requirements/nginx
     container_name: ${NGINX_CONTAINER_NAME}
     image: ${NGINX_IMAGE_NAME}
     ports:
       - ${NGINX_PORT}:${NGINX_PORT}
     volumes:
-      - ${INCEPTION_PATH}/secrets/ssl:/etc/nginx/ssl:ro
+      - ${SECRETS_PATH}/ssl:/etc/nginx/ssl:ro
+      - inception_wordpress_volume:/var/www/html
     env_file:
       - ${ENV_PATH}
     networks:
@@ -68,7 +70,7 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: ${INCEPTION_PATH}/srcs/requirements/mariadb/data
+      device: ${MDB_VOLUME}
     name: ${MDB_VOLUME_NAME}
 
   inception_wordpress_volume:
@@ -76,7 +78,7 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: ${INCEPTION_PATH}/srcs/requirements/wordpress/data
+      device: ${WP_VOLUME}
     name: ${WP_VOLUME_NAME}
 
 networks:

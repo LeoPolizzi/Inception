@@ -3,7 +3,7 @@
 // Set settings for WordPress database connection
 define( 'DB_NAME', getenv( 'MDB_NAME' ) );
 define( 'DB_USER', getenv( 'MDB_USER' ) );
-define( 'DB_PASSWORD', trim(file_get_content('/run/secrets/mariadb/mdb_user_pwd.txt')) );
+define( 'DB_PASSWORD', trim(file_get_contents('/secrets/mariadb/mdb_user_pwd.txt')) );
 define( 'DB_HOST', getenv('WP_MDB_HOST') . ':' . getenv('MDB_PORT'));
 define( 'DB_CHARSET', 'utf8' );
 define( 'DB_COLLATE', 'utf8_bin' );
