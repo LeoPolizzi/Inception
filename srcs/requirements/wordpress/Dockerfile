@@ -35,8 +35,5 @@ RUN		adduser -S ${WP_PHP_USER} \
 		&& mv -f wp-cli.phar /usr/local/bin/wp \
 		&& chmod +x setup.sh
 
-# Expose the necessary ports
-EXPOSE	9000
-
 # Set the setup script as the entrypoint
 CMD		["sh", "setup.sh"]
