@@ -1,3 +1,4 @@
+<pre lang="markdown">
 File Structure:
 .
 ├── .gitignore
@@ -35,3 +36,4 @@ File Structure:
             └── Dockerfile
 
 13 directories, 21 files
+</pre>
