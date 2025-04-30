@@ -1,4 +1,5 @@
-<pre lang="markdown"> <details> <summary>📁 Project Structure</summary> ```bash .
+<pre lang="markdown"> <details>
+.
 ├── .gitignore
 ├── Makefile
 ├── README.md
@@ -34,4 +35,4 @@
             └── Dockerfile
 
 13 directories, 21 files
- ``` </details> </pre>
+  </details> </pre>
