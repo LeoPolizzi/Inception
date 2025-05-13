@@ -13,7 +13,7 @@ BOLD	= \033[1m
 RESET	= \033[0m
 
 # Rules
-all: inception init_hosts build_containers logs
+all: inception init_hosts zimmer build_containers logs
 
 clean:
 	@echo "${BOLD}${RED}Taking down containers...${RESET}\n"
@@ -21,7 +21,7 @@ clean:
 	@echo "${BOLD}${RED}Removing logs...${RESET}\n"
 	@if [ -d "./logs" ]; then rm -rf ./logs; fi
 
-fclean: clean
+fclean: stopmusic clean
 	@echo "${BOLD}${RED}Removing volumes and containers...${RESET}\n"
 	@docker system prune -a --volumes -f
 	@docker network prune -f
@@ -85,3 +85,15 @@ inception:
 	@echo "${BOLD}${RED}     ${ORANGE}         ${YELLOW}        ${GREEN}        ${BLUE} ██      ${INDIGO}      ${VIOLET}     ${RED}        ${ORANGE}         ${YELLOW}▀█▀ ${RESET}"
 	@echo "${BOLD}${RED}     ${ORANGE}         ${YELLOW}        ${GREEN}        ${BLUE}▀▀▀▀     ${INDIGO}      ${VIOLET}     ${RED}        ${ORANGE}         ${YELLOW}    ${RESET}"
 
+# Music
+
+zimmer:
+	@echo "${BOLD}${RED}Playing Hans Zimmer - Time...${RESET}\n"
+	@mpg123 Hans_Zimmer_Time.mp3 & > /dev/null 2>&1 || true
+
+stopmusic:
+	@pkill -f mpg123 > /dev/null 2>&1 || true
+	@echo "${BOLD}${RED}Stopping music...${RESET}\n"
+
+# Phony targets
+.PHONY: all clean fclean re build_containers init_hosts exec_mariadb exec_wordpress exec_nginx logs cleanlogs relogs inception zimmer stopmusic
