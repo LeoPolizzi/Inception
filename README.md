@@ -1,6 +1,9 @@
+<pre lang="markdown">
+File Structure:
 .
 ├── .gitignore
 ├── Makefile
+├── README.md
 ├── secrets
 │   ├── mariadb
 │   │   ├── mdb_root_pwd.txt
@@ -32,4 +35,5 @@
             │   └── www.conf.template
             └── Dockerfile
 
-13 directories, 20 files
+13 directories, 21 files
+</pre>
