@@ -17,7 +17,7 @@ all: inception init_hosts zimmer build_containers logs
 
 clean:
 	@echo "${BOLD}${RED}Taking down containers...${RESET}\n"
-	@cd srcs && docker-compose down
+	@cd srcs ; docker-compose down
 	@echo "${BOLD}${RED}Removing logs...${RESET}\n"
 	@if [ -d "./logs" ]; then rm -rf ./logs; fi
 
@@ -25,8 +25,8 @@ fclean: clean
 	@echo "${BOLD}${RED}Removing volumes and containers...${RESET}\n"
 	@docker system prune -a --volumes -f
 	@docker network prune -f
-	@docker network rm $(docker network ls -q) 2> /dev/null || true
-	@docker volume rm $(docker volume ls -qf dangling=true) 2> /dev/null || true
+	@docker network rm $$(docker network ls -qf dangling=true) 2> /dev/null || true
+	@docker volume rm $$(docker volume ls -qf dangling=true) 2> /dev/null || true
 	@sudo rm -rf ${MDB_VOLUME} ${WP_VOLUME}
 	@make stopmusic > /dev/null 2>&1 || true
 
